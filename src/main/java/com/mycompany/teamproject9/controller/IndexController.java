@@ -17,4 +17,10 @@ public class IndexController {
 
         return "login";
     }
+
+    @GetMapping("/create")
+    public String create() {
+
+        return "create";
+    }
 }
