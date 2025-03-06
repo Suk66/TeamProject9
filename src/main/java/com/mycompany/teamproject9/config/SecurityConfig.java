@@ -16,10 +16,7 @@ public class SecurityConfig {
                         .antMatchers("/", "/home", "/login", "/create","/signup").permitAll()// 로그인 없이 접근 혀용
                         .anyRequest().authenticated()
                 )
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .permitAll()
-                )
+                .formLogin().disable()
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")

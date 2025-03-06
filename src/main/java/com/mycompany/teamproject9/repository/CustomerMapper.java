@@ -11,4 +11,8 @@ public interface CustomerMapper {
 
     @Select("select count(*) from customer where customer_email = #{email}")
     int countByEmail(String email);
+
+
+    @Select("select customer_pwd from customer where customer_email = #{email}")
+    String findPasswordByEmail(String email);
 }

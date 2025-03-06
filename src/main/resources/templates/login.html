@@ -129,8 +129,9 @@
 <div class="mytitle">
   <h1>로그인</h1>
 </div>
-<div class="mypostingbox" id="postingbox">
 
+<div class="mypostingbox" id="postingbox">
+<form id="loginForm">
   <div class="form-floating mb-3">
     <input type="text" class="form-control" id="email" placeholder="제목을 입력하세요">
     <label for="email">이메일</label>
@@ -142,7 +143,7 @@
   </div>
 
   <div class="mybtn">
-    <a href="/login" class="btn btn-outline-dark" style="margin-right: 30px">로그인</a>
+    <button type="submit" class="btn btn-outline-dark" style="margin-right: 30px">로그인</button>
 
     <a href="/create" class="btn btn-outline-dark">회원가입</a>
   </div>
@@ -164,10 +165,56 @@
     </div>
 
   </div>
-
+</form>
 </div>
 
-<!-- Option 1: Bootstrap Bundle with Popper -->
+<script>
+  document.getElementById("loginForm").addEventListener("submit",function (event){
+    event.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const pwd = document.getElementById("pwd").value.trim();
+
+    if (!email || !pwd){
+      alert("이메일과 비밀번호를 입력하세요!");
+      return;
+    }
+
+    const loginData = { email, pwd };
+
+    fetch("/login",{
+        method:"POST",
+        headers:{
+          "Content-Type" : "application/json"
+        },
+      body:JSON.stringify(loginData)
+    })
+            .then(response =>{
+              if (!response.ok){
+                throw new Error(`서버 오류 : ${response.status}`);
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log("디버깅 서버 응답 : ", data);
+              alert(data.message);
+
+              if (data.message.includes("로그인 성공")){
+                if(data.role === "ADMIN"){
+                  window.location.href = "/admin-dashboard"; // 관리자 페이지로 이동
+                }else if (data.role === "CUSTOMER"){
+                  window.location.href = "/customer-dashboard"; // 일반 회원 페이지로 이동
+                }
+              }
+            })
+            .catch(error =>{
+              console.error("디버깅 로그인 중 오류 발생 :", error);
+              alert("로그인 중 오류가 발생했습니다.")
+            });
+  });
+
+</script>
+
 
 
 </body>

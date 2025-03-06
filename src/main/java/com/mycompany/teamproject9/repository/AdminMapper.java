@@ -11,4 +11,8 @@ public interface AdminMapper {
 
     @Select("select count(*) from admin where admin_email = #{email}")
     int countByEmail(String email);
+
+
+    @Select("select admin_pwd from admin where admin_email = #{email}")
+    String findPasswordByEmail(String email);
 }

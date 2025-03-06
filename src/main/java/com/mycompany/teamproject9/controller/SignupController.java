@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/signup")
+@RequestMapping("/create")
 public class SignupController {
 
     @Autowired
