@@ -1,0 +1,13 @@
+package com.mycompany.teamproject9.util;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PasswordEncoderUtil {
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public String encodePassword(String rawPassword){
+        return passwordEncoder.encode(rawPassword);
+    }
+}
