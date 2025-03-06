@@ -33,6 +33,13 @@ public class SignupController {
         try{
             System.out.println("디버깅 회원가입 요청 받음: " + request);
 
+            boolean isEmailExists = adminMapper.countByEmail(request.getEmail()) > 0
+                    || customerMapper.countByEmail(request.getEmail()) > 0;
+
+            if(isEmailExists){
+                response.put("message","이미 가입된 이메일입니다.");
+                return response;
+            }
 
             if ("customer".equals(request.getUserType())){
                 customerMapper.insertCustomer(request);
