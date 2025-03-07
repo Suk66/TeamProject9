@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SignupRequest {
+public class CreateRequest {
     private String userType;    // admin 또는 customer
     private String name;
     private String email;

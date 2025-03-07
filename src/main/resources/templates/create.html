@@ -129,7 +129,7 @@
 
 
 <body>
-<form id = "signupForm">
+<form id = "createForm">
 <div class="mytitle">
     <h1>회원가입</h1>
 </div>
@@ -205,14 +205,14 @@
 
     // 🚀 새로운 코드 (회원가입 버튼 클릭 시 데이터 전송)
     document.addEventListener("DOMContentLoaded", function () {
-        const signupForm = document.getElementById("signupForm");
+        const createForm = document.getElementById("createForm");
 
-        if (!signupForm) {
-            console.error("❌ [오류] signupForm 요소를 찾을 수 없습니다!");
+        if (!createForm) {
+            console.error("❌ [오류] createForm 요소를 찾을 수 없습니다!");
             return;
         }
 
-        signupForm.addEventListener("submit", function (event) {
+        createForm.addEventListener("submit", function (event) {
             event.preventDefault();  // 기본 폼 제출 방지
             console.log("📌 [디버깅] 회원가입 버튼 클릭됨!");
 
@@ -226,7 +226,7 @@
             };
             console.log("📌 [디버깅] 수집된 회원가입 데이터:", formData);
 
-            // 🔹 서버(`/signup`)로 데이터 전송
+            // 🔹 서버(`/create`)로 데이터 전송
             fetch("/create", {
                 method: "POST",
                 headers: {
