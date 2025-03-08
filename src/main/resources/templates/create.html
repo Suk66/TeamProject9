@@ -199,7 +199,16 @@
     document.querySelectorAll('input[name="userType"]').forEach(radio => {
         radio.addEventListener("change", function () {
             const isAdmin = this.value === "admin";
-            document.getElementById("addr").style.display = isAdmin ? "none" : "block";
+            const addrInput = document.getElementById("addr");
+            const addrLabel = document.querySelector('label[for="addr"]');
+
+            if (isAdmin){
+                addrInput.style.display = "none";
+                addrLabel.style.display = "none";
+            }else {
+                addrInput.style.display = "block";
+                addrLabel.style.display = "block";
+            }
         });
     });
 
