@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Select;
 
 public interface CustomerMapper {
     @Insert("insert into customer(customer_name, customer_pwd, customer_email,customer_phone,customer_addr, role) "+
-    "values(#{name},#{pwd},#{email},#{phone},#{addr}, 'CUSTOMER') ")
+            "values(#{name},#{pwd},#{email},#{phone},#{addr}, 'CUSTOMER') ")
     void insertCustomer(CreateRequest request);
 
     @Select("select count(*) from customer where customer_email = #{email}")
@@ -15,4 +15,8 @@ public interface CustomerMapper {
 
     @Select("select customer_pwd from customer where customer_email = #{email}")
     String findPasswordByEmail(String email);
+
+    @Select("SELECT COUNT(*) FROM customer WHERE customer_phone = #{phone}")
+    int countByPhone(String phone);
+
 }
