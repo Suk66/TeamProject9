@@ -14,18 +14,28 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeRequests(auth -> auth
-                        .antMatchers("/", "/home", "/login", "/create", "/signup", "/session/info").permitAll() // 로그인 없이 접근 가능
-                        .antMatchers("/admin/**").hasRole("ADMIN") // 관리자만 접근 가능
-                        .antMatchers("/customer/**").hasRole("CUSTOMER") // 일반회원만 접근 가능
-                        .antMatchers("/customer-dashboard").hasRole("CUSTOMER") // 로그인한 사용자 모두 허용
+                        .antMatchers("/", "/home", "/login", "/create", "/signup", "/session/info").permitAll()
+                        .antMatchers("/dashboard/admin").hasRole("ADMIN")
+                        .antMatchers("/dashboard/customer").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // ✅ 세션이 필요할 때 생성하도록 설정
-                        .maximumSessions(1) // ✅ 하나의 세션만 유지 (중복 로그인 방지)
-                        .expiredUrl("/login?expired") // ✅ 세션 만료 시 로그인 페이지로 이동
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(1)
+                        .expiredUrl("/login?expired")
                 )
-                .formLogin().disable();
+                .formLogin().disable() // ✅ Spring Security 기본 로그인 비활성화
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .permitAll()
+                )
+                // ✅ 로그인하지 않은 상태에서 보호된 페이지 접근 시 로그인 페이지로 리디렉트
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/login");
+                        })
+                );
 
         return http.build();
     }

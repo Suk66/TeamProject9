@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,15 +73,18 @@ public class LoginController {
         return response;
     }
 
-    private void setAuthentication(String email, String role, HttpServletRequest request) {
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(email,null, Collections.singletonList(new SimpleGrantedAuthority(role)));
+   private void setAuthentication(String email, String role, HttpServletRequest request) {
+    UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+            email, "", Collections.singletonList(new SimpleGrantedAuthority(role)));
 
+    UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-                HttpSession session = request.getSession(true);
-                session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-    }
+    HttpSession session = request.getSession(true);
+    session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+}
+
 
 }
