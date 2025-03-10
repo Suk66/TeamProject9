@@ -4,7 +4,12 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+
+  <!-- Google reCAPTCHA -->
+  <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+
 
 
   <!-- Bootstrap CSS -->
@@ -190,52 +195,53 @@
 </div>
 
 <script>
-
-  document.getElementById("loginForm").addEventListener("submit",function (event){
+  document.getElementById("loginForm").addEventListener("submit", function (event) {
     event.preventDefault();
 
     const email = document.getElementById("email").value.trim();
     const pwd = document.getElementById("pwd").value.trim();
 
-    if (!email || !pwd){
-      alert("이메일과 비밀번호를 입력하세요!");
-      return;
+
+    if (!email || !pwd) {
+        alert("이메일과 비밀번호를 입력하세요!");
+        return;
     }
 
-    const loginData = { email, pwd };
+    // 로그인 데이터 객체 정의
+    const loginData = {
+        email: email,
+        pwd: pwd
+    };
 
-    fetch("/login",{
-      method:"POST",
-      headers:{
-        "Content-Type" : "application/json"
-      },
-      body:JSON.stringify(loginData)
+    fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData)
     })
-            .then(response =>{
-              if (!response.ok){
-                throw new Error(`서버 오류 : ${response.status}`);
-              }
-              return response.json();
-            })
-            .then(data => {
-              console.log("디버깅 서버 응답 : ", data);
-              alert(data.message);
+    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+    .then(result => {
+        console.log("🔍 서버 응답:", result);
 
-              if (data.message.includes("로그인 성공")){
-                if(data.role === "ROLE_ADMIN"){
-                  window.location.href = "/dashboard/admin"; // 관리자 페이지로 이동
-                }else if (data.role === "ROLE_CUSTOMER"){
-                  window.location.href = "/dashboard/customer"; // 일반 회원 페이지로 이동
-                }
-              }
-            })
-            .catch(error =>{
-              console.error("디버깅 로그인 중 오류 발생 :", error);
-              alert("로그인 중 오류가 발생했습니다.")
-            });
-  });
+        if (result.status === 200) {  // ✅ 성공
+            alert(result.body.message);
+            if (result.body.role === "ROLE_ADMIN") {
+                window.location.href = "/dashboard/admin";
+            } else if (result.body.role === "ROLE_CUSTOMER") {
+                window.location.href = "/dashboard/customer";
+            }
+        } else if (result.status === 400) {  // ❌ 실패
+            alert(result.body.message);  // 정확한 실패 메시지 출력
+        }
+    })
+    .catch(error => {
+        console.error("⚠️ 로그인 요청 중 오류 발생:", error);
+        alert("로그인 중 오류가 발생했습니다.");
+    });
+});
+
 
 </script>
+
 
 
 

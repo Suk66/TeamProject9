@@ -12,11 +12,7 @@ public class ProductController {
         return "/product/index";
     }
 
-    @GetMapping("/login")
-    public String login() {
 
-        return "login";
-    }
 
     @GetMapping("/create")
     public String create() {
