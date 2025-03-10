@@ -130,139 +130,171 @@
 
 <body>
 <form id = "createForm">
-<div class="mytitle">
-    <h1>회원가입</h1>
-</div>
-<div class="mypostingbox" id="postingbox">
-
-    <div class="mb-3">
-        <label>회원 유형 선택</label><br>
-        <input type="radio" name="userType" value="customer" checked>일반 회원
-        <input type="radio" name="userType" value="admin">관리자
+    <div class="mytitle">
+        <h1>회원가입</h1>
     </div>
+    <div class="mypostingbox" id="postingbox">
 
-    <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="email" placeholder="이메일을 입력하세요">
-        <label for="email">이메일</label>
-    </div>
+        <div class="mb-3">
+            <label>회원 유형 선택</label><br>
+            <input type="radio" name="userType" value="customer" checked>일반 회원
+            <input type="radio" name="userType" value="admin">관리자
+        </div>
 
-    <div class="form-floating mb-3">
-        <input type="password" class="form-control" id="pwd" placeholder="비밀번호를 입력하세요">
-        <label for="pwd">비밀번호</label>
-    </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="email" placeholder="이메일을 입력하세요">
+            <label for="email">이메일</label>
+        </div>
 
-    <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="name" placeholder="비밀번호를 입력하세요">
-        <label for="name">이름</label>
-    </div>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="pwd" placeholder="비밀번호를 입력하세요">
+            <label for="pwd">비밀번호</label>
+        </div>
 
-    <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="phone" placeholder="휴대폰 번호를 입력하세요">
-        <label for="name">휴대폰 번호</label>
-    </div>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="confirmPwd" placeholder="비밀번호를 다시 입력하세요">
+            <label for="confirmPwd">비밀번호 확인</label>
+            <span id="passwordError" style="color: red; display: none;">비밀번호가 일치하지 않습니다.</span>
+        </div>
 
-    <div class="form-floating mb-3">
-        <input type="text"  class="form-control" id="addr" placeholder="주소를 입력하세요">
-        <label for="name">주소</label>
-    </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="name" placeholder="비밀번호를 입력하세요">
+            <label for="name">이름</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="phone" placeholder="휴대폰 번호를 입력하세요">
+            <label for="name">휴대폰 번호</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="text"  class="form-control" id="addr" placeholder="주소를 입력하세요">
+            <label for="name">주소</label>
+        </div>
 
 
 
-    <div class="mybtn" >
+        <div class="mybtn" >
 
 
-        <button type="submit" class="btn btn-outline-dark">회원가입</button>
-        <button type="reset" class="btn btn-outline-dark">다시작성</button>
-    </div>
+            <button type="submit" class="btn btn-outline-dark">회원가입</button>
+            <button type="reset" class="btn btn-outline-dark">다시작성</button>
+        </div>
 
 
 
-    <div class="mycards">
-        <div id="cardgo" class="row row-cols-1 row-cols-md-3">
-            <div class="col h-100">
+        <div class="mycards">
+            <div id="cardgo" class="row row-cols-1 row-cols-md-3">
+                <div class="col h-100">
 
-            </div>
+                </div>
 
-            <div class="col">
+                <div class="col">
 
-            </div>
+                </div>
 
-            <div class="col">
+                <div class="col">
+
+                </div>
 
             </div>
 
         </div>
-
-    </div>
 </form>
 <script>
     document.querySelectorAll('input[name="userType"]').forEach(radio => {
-        radio.addEventListener("change", function () {
-            const isAdmin = this.value === "admin";
-            const addrInput = document.getElementById("addr");
-            const addrLabel = document.querySelector('label[for="addr"]');
+    radio.addEventListener("change", function () {
+        const isAdmin = this.value === "admin";
+        const addrInput = document.getElementById("addr");
+        const addrLabel = document.querySelector('label[for="addr"]');
 
-            if (isAdmin){
-                addrInput.style.display = "none";
-                addrLabel.style.display = "none";
-            }else {
-                addrInput.style.display = "block";
-                addrLabel.style.display = "block";
-            }
-        });
+        if (isAdmin){
+            addrInput.style.display = "none";
+            addrLabel.style.display = "none";
+        } else {
+            addrInput.style.display = "block";
+            addrLabel.style.display = "block";
+        }
     });
+});
 
-    // 🚀 새로운 코드 (회원가입 버튼 클릭 시 데이터 전송)
-    document.addEventListener("DOMContentLoaded", function () {
-        const createForm = document.getElementById("createForm");
+// 🚀 새로운 코드 (회원가입 버튼 클릭 시 데이터 전송)
+document.addEventListener("DOMContentLoaded", function () {
+    const createForm = document.getElementById("createForm");
+    const passwordInput = document.getElementById("pwd");
+    const confirmPasswordInput = document.getElementById("confirmPwd");
+    const passwordError = document.getElementById("passwordError");
+    const submitButton = document.querySelector("button[type='submit']");
 
-        if (!createForm) {
-            console.error("❌ [오류] createForm 요소를 찾을 수 없습니다!");
-            return;
+    if (!createForm) {
+        console.error("❌ [오류] createForm 요소를 찾을 수 없습니다!");
+        return;
+    }
+
+    // 🚀 비밀번호 & 비밀번호 확인 일치 여부 검사
+    function checkPasswordMatch() {
+        if (passwordInput.value !== confirmPasswordInput.value) {
+            passwordError.style.display = "block"; // 경고 메시지 표시
+            submitButton.disabled = true; // 가입 버튼 비활성화
+        } else {
+            passwordError.style.display = "none"; // 경고 메시지 숨김
+            submitButton.disabled = false; // 가입 버튼 활성화
+        }
+    }
+
+    // 입력 필드 변경 감지하여 실시간 검사
+    passwordInput.addEventListener("input", checkPasswordMatch);
+    confirmPasswordInput.addEventListener("input", checkPasswordMatch);
+
+    createForm.addEventListener("submit", function (event) {
+        event.preventDefault();  // 기본 폼 제출 방지
+        console.log("📌 [디버깅] 회원가입 버튼 클릭됨!");
+
+        // 🚀 최종 검사 (비밀번호 확인 필드 체크)
+        if (passwordInput.value !== confirmPasswordInput.value) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return; // 🚫 서버로 데이터 전송 안 함
         }
 
-        createForm.addEventListener("submit", function (event) {
-            event.preventDefault();  // 기본 폼 제출 방지
-            console.log("📌 [디버깅] 회원가입 버튼 클릭됨!");
+        const formData = {
+            userType: document.querySelector('input[name="userType"]:checked').value,
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            pwd: passwordInput.value,
+            phone: document.getElementById("phone").value,
+            addr: document.getElementById("addr") ? document.getElementById("addr").value : ""
+        };
+        console.log("📌 [디버깅] 수집된 회원가입 데이터:", formData);
 
-            const formData = {
-                userType: document.querySelector('input[name="userType"]:checked').value,
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                pwd: document.getElementById("pwd").value,
-                phone: document.getElementById("phone").value,
-                addr: document.getElementById("addr") ? document.getElementById("addr").value : ""
-            };
-            console.log("📌 [디버깅] 수집된 회원가입 데이터:", formData);
-
-            // 🔹 서버(`/create`)로 데이터 전송
-            fetch("/create", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => {
-                console.log("📌 [디버깅] 서버 응답 상태 코드:", response.status); // 🔹 응답 상태 코드 출력
-                if (!response.ok) {
-                    throw new Error(`서버 오류: ${response.status}`);
-                }
-                return response.json(); // ✅ JSON 변환 실행 (여기서 실행해야 함)
-            })
-            .then(data => {
-                console.log("📌 [디버깅] 서버 응답:", data);
-                alert(data.message);
-                if (data.message === "회원가입 성공!") {
-                    window.location.href = "/login"; // 성공 시 로그인 페이지로 이동
-                }
-            })
-            .catch(error => {
-                console.error("❌ [디버깅] 회원가입 중 오류 발생:", error);
-                alert("회원가입 중 오류가 발생했습니다.");
-            });
+        // 🔹 서버(`/create`)로 데이터 전송
+        fetch("/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            console.log("📌 [디버깅] 서버 응답 상태 코드:", response.status);
+            if (!response.ok) {
+                throw new Error(`서버 오류: ${response.status}`);
+            }
+            return response.json(); // ✅ JSON 변환 실행
+        })
+        .then(data => {
+            console.log("📌 [디버깅] 서버 응답:", data);
+            alert(data.message);
+            if (data.message === "회원가입 성공") {
+                window.location.href = "/login"; // 성공 시 로그인 페이지로 이동
+            }
+        })
+        .catch(error => {
+            console.error("❌ [디버깅] 회원가입 중 오류 발생:", error);
+            alert("회원가입 중 오류가 발생했습니다.");
         });
     });
+});
+
 </script>
 
 
