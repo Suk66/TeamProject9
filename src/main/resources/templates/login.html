@@ -70,6 +70,15 @@
       margin-right: 5px;
     }
 
+    /* 비밀번호 찾기 버튼 클릭 시 테두리 제거 */
+    .btn-link:focus {
+      outline: none;
+      box-shadow: none;
+    }
+    .btn-link {
+      color: #888888 !important; /* 글자색 변경 */
+      text-decoration: none !important; /* 밑줄 제거 */
+    }
   </style>
 
   <script>
@@ -131,22 +140,29 @@
 </div>
 
 <div class="mypostingbox" id="postingbox">
-<form id="loginForm">
-  <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="email" placeholder="제목을 입력하세요">
-    <label for="email">이메일</label>
-  </div>
+  <form id="loginForm">
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="email" placeholder="제목을 입력하세요">
+      <label for="email">이메일</label>
+    </div>
 
-  <div class="form-floating mb-3">
-    <input type="password" class="form-control" id="pwd" placeholder="상품설명을 작성하세요">
-    <label for="pwd">비밀번호</label>
-  </div>
+    <div class="form-floating mb-3">
+      <input type="password" class="form-control" id="pwd" placeholder="상품설명을 작성하세요">
+      <label for="pwd">비밀번호</label>
+    </div>
 
-  <div class="mybtn">
-    <button type="submit" class="btn btn-outline-dark" style="margin-right: 30px">로그인</button>
+    <div class="mybtn">
+      <button type="submit" class="btn btn-outline-dark" style="margin-right: 30px">로그인</button>
 
-    <a href="/create" class="btn btn-outline-dark">회원가입</a>
-  </div>
+      <a href="/create" class="btn btn-outline-dark">회원가입</a>
+    </div>
+
+    <!-- 🚀 비밀번호 찾기 버튼 추가 -->
+    <div class="text-center mt-3">
+      <button type="button" class="btn btn-link" onclick="location.href='/find-password'">
+        비밀번호 찾기
+      </button>
+    </div>
 
 
 
@@ -165,10 +181,11 @@
     </div>
 
   </div>
-</form>
+  </form>
 </div>
 
 <script>
+
   document.getElementById("loginForm").addEventListener("submit",function (event){
     event.preventDefault();
 
@@ -183,10 +200,10 @@
     const loginData = { email, pwd };
 
     fetch("/login",{
-        method:"POST",
-        headers:{
-          "Content-Type" : "application/json"
-        },
+      method:"POST",
+      headers:{
+        "Content-Type" : "application/json"
+      },
       body:JSON.stringify(loginData)
     })
             .then(response =>{

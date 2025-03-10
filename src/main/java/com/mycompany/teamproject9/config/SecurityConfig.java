@@ -14,7 +14,7 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeRequests(auth -> auth
-                        .antMatchers("/", "/home", "/login", "/create", "/signup", "/session/info").permitAll()
+                        .antMatchers("/", "/home", "/login", "/create", "/signup", "/session/info", "/find-password").permitAll()
                         .antMatchers("/dashboard/admin").hasRole("ADMIN")
                         .antMatchers("/dashboard/customer").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
