@@ -200,10 +200,10 @@
               alert(data.message);
 
               if (data.message.includes("로그인 성공")){
-                if(data.role === "ADMIN"){
-                  window.location.href = "/admin-dashboard"; // 관리자 페이지로 이동
-                }else if (data.role === "CUSTOMER"){
-                  window.location.href = "/customer-dashboard"; // 일반 회원 페이지로 이동
+                if(data.role === "ROLE_ADMIN"){
+                  window.location.href = "/dashboard/admin"; // 관리자 페이지로 이동
+                }else if (data.role === "ROLE_CUSTOMER"){
+                  window.location.href = "/dashboard/customer"; // 일반 회원 페이지로 이동
                 }
               }
             })
