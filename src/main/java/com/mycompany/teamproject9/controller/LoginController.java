@@ -54,48 +54,40 @@ public class LoginController {
         return "redirect:/login"; // 유효하지 않은 role이 있다면 로그인 페이지로 리다이렉트
     }
 
-    @PostMapping
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
-        Map<String, String> response = new HashMap<>();
-        HttpSession session = httpRequest.getSession();
+   @PostMapping
+@ResponseBody
+public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+    Map<String, String> response = new HashMap<>();
+    HttpSession session = httpRequest.getSession();
 
-        // reCAPTCHA 응답 검증
-        String recaptchaResponse = request.getRecaptchaResponse();
-        boolean isRecaptchaValid = recaptchaService.verifyRecaptcha(recaptchaResponse);
+    String email = request.getEmail();
+    String password = request.getPwd();
+    String storedPassword = null;
 
-        if (!isRecaptchaValid) {
-            response.put("message", "reCAPTCHA 검증 실패");
-            return ResponseEntity.status(400).body(response);
-        }
-
-        // 로그인 검증 로직 (이메일과 비밀번호)
-        String email = request.getEmail();
-        String password = request.getPwd();
-        String storedPassword = null;
-
-        // 관리자 로그인 검증
-        storedPassword = adminMapper.findPasswordByEmail(email);
-        if (storedPassword != null && PasswordUtil.checkPassword(password, storedPassword)) {
-            session.setAttribute("user", email);
-            session.setAttribute("role", "ROLE_ADMIN");
-            response.put("message", "로그인 성공 (관리자)");
-            response.put("role", "ROLE_ADMIN");
-            return ResponseEntity.ok(response);
-        }
-
-        // 일반회원 로그인 검증
-        storedPassword = customerMapper.findPasswordByEmail(email);
-        if (storedPassword != null && PasswordUtil.checkPassword(password, storedPassword)) {
-            session.setAttribute("user", email);
-            session.setAttribute("role", "ROLE_CUSTOMER");
-            response.put("message", "로그인 성공 (일반회원)");
-            response.put("role", "ROLE_CUSTOMER");
-            return ResponseEntity.ok(response);
-        }
-
-        // 로그인 실패
-        response.put("message", "이메일 또는 비밀번호가 일치하지 않습니다.");
-        return ResponseEntity.status(400).body(response);
+    // 관리자 로그인 검증
+    storedPassword = adminMapper.findPasswordByEmail(email);
+    if (storedPassword != null && PasswordUtil.checkPassword(password, storedPassword)) {
+        session.setAttribute("user", email);  // ✅ 세션에 이메일 저장
+        session.setAttribute("role", "ROLE_ADMIN");
+        response.put("message", "로그인 성공 (관리자)");
+        response.put("role", "ROLE_ADMIN");
+        return ResponseEntity.ok(response);
     }
+
+    // 일반회원 로그인 검증
+    storedPassword = customerMapper.findPasswordByEmail(email);
+    if (storedPassword != null && PasswordUtil.checkPassword(password, storedPassword)) {
+        session.setAttribute("user", email);  // ✅ 세션에 이메일 저장
+        session.setAttribute("role", "ROLE_CUSTOMER");
+        response.put("message", "로그인 성공 (일반회원)");
+        response.put("role", "ROLE_CUSTOMER");
+        return ResponseEntity.ok(response);
+    }
+
+    // 로그인 실패
+    response.put("message", "이메일 또는 비밀번호가 일치하지 않습니다.");
+    return ResponseEntity.status(400).body(response);
+}
+
+
 }

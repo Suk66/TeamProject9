@@ -1,6 +1,7 @@
 package com.mycompany.teamproject9.repository;
 
 import com.mycompany.teamproject9.dto.CreateRequest;
+import com.mycompany.teamproject9.dto.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -38,5 +39,13 @@ public interface CustomerMapper {
     String findEmailByPhone(@Param("phone") String phone);
 
 
+
+    @Select("SELECT customer_name AS name, customer_email AS email, customer_phone AS phone, customer_addr AS addr, 'customer' AS userType FROM customer WHERE customer_email = #{email}")
+    User findByEmail(@Param("email") String email);
+
+
+
+    @Update("UPDATE customer SET customer_name=#{name}, customer_phone=#{phone}, customer_addr=#{addr} WHERE customer_email=#{email}")
+    int updateUserInfo(User user);
 
 }

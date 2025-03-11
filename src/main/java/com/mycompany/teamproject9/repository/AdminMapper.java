@@ -1,6 +1,7 @@
 package com.mycompany.teamproject9.repository;
 
 import com.mycompany.teamproject9.dto.CreateRequest;
+import com.mycompany.teamproject9.dto.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -37,4 +38,10 @@ public interface AdminMapper {
     String findEmailByPhone(@Param("phone") String phone);
 
 
+    @Select("SELECT admin_name AS name, admin_email AS email, admin_phone AS phone, NULL AS addr, 'admin' AS userType FROM admin WHERE admin_email = #{email}")
+    User findByEmail(@Param("email") String email);
+
+
+    @Update("UPDATE admin SET admin_name=#{name}, admin_phone=#{phone} WHERE admin_email=#{email}")
+    int updateUserInfo(User user);
 }
