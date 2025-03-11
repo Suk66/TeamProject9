@@ -45,7 +45,7 @@ public interface CustomerMapper {
 
 
 
-    @Update("UPDATE customer SET customer_name=#{name}, customer_phone=#{phone}, customer_addr=#{addr} WHERE customer_email=#{email}")
-    int updateUserInfo(User user);
+    @Update("UPDATE customer SET customer_name = #{name}, customer_phone = #{phone}, customer_addr = #{addr} WHERE customer_email = #{email}")
+    int updateUser(User user);
 
 }

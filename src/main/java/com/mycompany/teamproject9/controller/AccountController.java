@@ -52,6 +52,35 @@ public class AccountController {
         return "update-account";  // ✅ Thymeleaf 템플릿 (update-account.html) 반환
     }
 
+    @PostMapping("/update")
+    @ResponseBody
+    public Map<String, Object> updateUserInfo(@RequestBody User updatedUser, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+
+        // ✅ 세션에서 로그인한 사용자의 이메일 가져오기
+        String email = (String) session.getAttribute("user");
+        if (email == null) {
+            response.put("success", false);
+            response.put("message", "로그인이 필요합니다.");
+            return response;
+        }
+
+        // ✅ 업데이트할 데이터 설정
+        updatedUser.setEmail(email); // 이메일은 변경 불가
+        boolean isUpdated = userService.updateUserInfo(updatedUser);
+
+        if (isUpdated) {
+            response.put("success", true);
+            response.put("message", "회원 정보가 수정되었습니다.");
+        } else {
+            response.put("success", false);
+            response.put("message", "회원 정보 수정 실패.");
+        }
+
+        return response;
+    }
+
+
 }
 
 

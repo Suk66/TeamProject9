@@ -42,6 +42,6 @@ public interface AdminMapper {
     User findByEmail(@Param("email") String email);
 
 
-    @Update("UPDATE admin SET admin_name=#{name}, admin_phone=#{phone} WHERE admin_email=#{email}")
-    int updateUserInfo(User user);
+    @Update("UPDATE admin SET admin_name = #{name}, admin_phone = #{phone} WHERE admin_email = #{email}")
+    int updateUser(User user);
 }

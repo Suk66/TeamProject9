@@ -23,5 +23,14 @@ public class UserService {
         }
         return user;
     }
+    public boolean updateUserInfo(User user) {
+        int rowsAffected = 0;
+        if ("customer".equals(user.getUserType())) {
+            rowsAffected = customerMapper.updateUser(user);
+        } else if ("admin".equals(user.getUserType())) {
+            rowsAffected = adminMapper.updateUser(user);
+        }
+        return rowsAffected > 0; // 업데이트 성공 여부 반환
+    }
 }
 
