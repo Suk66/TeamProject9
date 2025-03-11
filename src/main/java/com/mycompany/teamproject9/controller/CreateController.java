@@ -51,12 +51,19 @@ public class CreateController {
             return response;
         }
 
-        // ✅ 이메일 중복 확인 (두 테이블에서 동시에 확인)
+        // ✅ 이메일 & 휴대폰 번호 중복 확인 (두 테이블에서 동시에 확인)
         int adminEmailCount = adminMapper.countByEmail(request.getEmail());
         int customerEmailCount = customerMapper.countByEmail(request.getEmail());
+        int adminPhoneCount = adminMapper.countByPhone(request.getPhone());
+        int customerPhoneCount = customerMapper.countByPhone(request.getPhone());
 
         if (adminEmailCount > 0 || customerEmailCount > 0) {
             response.put("message", "이메일이 이미 존재합니다.");
+            return response;
+        }
+
+        if (adminPhoneCount > 0 || customerPhoneCount > 0) {
+            response.put("message", "휴대폰 번호가 이미 사용 중입니다.");
             return response;
         }
 

@@ -33,5 +33,8 @@ public interface AdminMapper {
     @Update("UPDATE admin SET admin_pwd = #{password} WHERE admin_email = #{email}")
     void updatePassword(@Param("email") String email, @Param("password") String hashedPassword);
 
+    @Select("SELECT admin_email FROM admin WHERE admin_phone = #{phone}")
+    String findEmailByPhone(@Param("phone") String phone);
+
 
 }

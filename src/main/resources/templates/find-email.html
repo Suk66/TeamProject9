@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <title>이메일 찾기</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap');
+    * {
+      font-family: "Merriweather", serif;
+    }
+
+    .mytitle {
+
+      height: 250px;
+      color: white;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      background-image: url('https://images.unsplash.com/photo-1511992243105-2992b3fd0410?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+      background-position: center;
+      background-size: cover;
+
+    }
+    .mytitle > button {
+      width: 150px;
+      height: 50px;
+      background-color: transparent;
+      color: white;
+      border: 1px solid white;
+      border-radius: 5px;
+
+      margin-top: 20px;
+    }
+
+    .mycards {
+      width: 1200px;
+
+      margin: 30px auto 0px auto;
+    }
+    .mypostingbox{
+      height: 220px;
+      width: 500px;
+      margin: 50px auto 0px auto;
+      padding: 20px;
+      box-shadow: 0px 0px 3px 0px blue;
+      border-radius: 5px;
+    }
+
+    .mybtn {
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mybtn > button {
+      margin-right: 5px;
+    }
+
+    /* 비밀번호 찾기 버튼 클릭 시 테두리 제거 */
+    .btn-link:focus {
+      outline: none;
+      box-shadow: none;
+    }
+    .btn-link {
+      color: #888888 !important; /* 글자색 변경 */
+      text-decoration: none !important; /* 밑줄 제거 */
+    }
+  </style>
+
+  <script>
+    $(document).ready(function () {
+      let url = "http://spartacodingclub.shop/sparta_api/seoulair";
+      fetch(url).then(res => res.json()).then(data => {
+        let mise = data['RealtimeCityAir']['row'][0]['IDEX_NM']
+        $('#seoulmise').text(mise)
+      })
+    })
+
+
+    function openclose() {
+      $('#postingbox').toggle();
+    }
+    function makeCard() {
+      <!-- let image = $('#image').val(); -->
+      let fileInput = document.getElementById('imageUpload');
+      let file = fileInput.files[0];
+
+      if (!file) {
+        alert("이미지를 선택하세요!");
+        return;
+      }
+      let reader = new FileReader();
+      reader.onload = function(e) {
+        let imageSrc = e.target.result;
+        let title = $('#title').val();
+        let content = $('#content').val();
+
+        let temp_html = `
+          <div class="col h-100">
+            <div class="card">
+              <img src="${imageSrc}" class="card-img-top" alt="Uploaded Image">    <!-- 동적으로 이미지 적용 -->
+
+              <div class="card-body">
+                <h5 class="card-title">${title}</h5>
+                <p class="card-text">${content}</p>
+              </div>
+            </div>
+          </div>`;
+        $('#cardgo').append(temp_html);
+
+        fileInput.value = "";
+        $('#title').val('');
+        $('#content').val('');
+      };
+      reader.readAsDataURL(file);
+    }
+
+  </script>
+
+</head>
+
+
+<body>
+<div class="mytitle">
+  <h1>이메일 찾기</h1>
+</div>
+
+<div class="mypostingbox" id="postingbox">
+  <form id="findEmailForm" action="/find-email" method="POST">
+
+
+      <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="phone" name="phone" placeholder="제목을 입력하세요">
+      <label for="phone">휴대폰 번호</label>
+    </div>
+
+
+
+    <div class="mybtn">
+      <button type="submit" class="btn btn-outline-dark" style="margin-right: 30px">이메일 찾기</button>
+
+
+    </div>
+
+
+
+
+
+<div class="mycards">
+  <div id="cardgo" class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col h-100">
+
+    </div>
+
+    <div class="col">
+
+    </div>
+
+    <div class="col">
+
+    </div>
+
+  </div>
+  </form>
+</div>
+
+<script>
+ document.getElementById("loginForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const phone = document.getElementById("phone").value.trim();
+
+    if (!phone) {
+        alert("휴대폰 번호를 입력하세요!");
+        return;
+    }
+
+    // ✅ 올바른 JSON 요청 전송
+    fetch("/find-email", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json" // JSON 데이터임을 명확히 지정
+        },
+        body: JSON.stringify({ phone: phone }) // JSON 데이터 변환 후 전송
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = "/find-email-result"; // 결과 페이지로 이동
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error("이메일 찾기 오류:", error);
+        alert("오류 발생! 다시 시도하세요.");
+    });
+});
+
+</script>
+
+
+
+
+</body>
+</html>

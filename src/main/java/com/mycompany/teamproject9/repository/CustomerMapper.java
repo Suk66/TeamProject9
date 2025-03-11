@@ -34,4 +34,9 @@ public interface CustomerMapper {
     @Update("UPDATE customer SET customer_pwd = #{password} WHERE customer_email = #{email}")
     void updatePassword(@Param("email") String email, @Param("password") String hashedPassword);
 
+    @Select("SELECT customer_email FROM customer WHERE customer_phone = #{phone}")
+    String findEmailByPhone(@Param("phone") String phone);
+
+
+
 }
