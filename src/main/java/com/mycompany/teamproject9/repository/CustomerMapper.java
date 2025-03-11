@@ -31,7 +31,7 @@ public interface CustomerMapper {
     boolean checkEmailExists(@Param("email") String email);
 
     // ✅ 비밀번호 변경
-    @Update("UPDATE customer SET customer_pwd = #{pwd} WHERE customer_email = #{email}")
+    @Update("UPDATE customer SET customer_pwd = #{password} WHERE customer_email = #{email}")
     void updatePassword(@Param("email") String email, @Param("password") String hashedPassword);
 
 }

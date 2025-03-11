@@ -30,7 +30,7 @@ public interface AdminMapper {
     boolean checkEmailExists(@Param("email") String email);
 
     // ✅ 비밀번호 변경
-    @Update("UPDATE admin SET admin_pwd = #{pwd} WHERE admin_email = #{email}")
+    @Update("UPDATE admin SET admin_pwd = #{password} WHERE admin_email = #{email}")
     void updatePassword(@Param("email") String email, @Param("password") String hashedPassword);
 
 

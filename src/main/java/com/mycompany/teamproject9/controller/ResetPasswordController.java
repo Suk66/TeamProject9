@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller  // ✅ 변경: RestController → Controller (HTML 반환 가능)
+@Controller  // ✅ HTML 반환을 위해 RestController → Controller 변경
 public class ResetPasswordController {
 
     @Autowired
@@ -19,19 +19,30 @@ public class ResetPasswordController {
     @Autowired
     private AdminMapper adminMapper;
 
-    // ✅ 비밀번호 재설정 페이지(GET 요청 허용)
+    // ✅ 비밀번호 재설정 페이지 반환 (GET 요청)
     @GetMapping("/reset-password")
-    public String showResetPasswordPage(@RequestParam("email") String email, Model model) {
+    public String showResetPasswordPage(@RequestParam(value = "email", required = false) String email, Model model) {
+        if (email == null || email.trim().isEmpty()) {
+            return "redirect:/find-password";  // ✅ email 값이 없으면 비밀번호 찾기 페이지로 이동
+        }
         model.addAttribute("email", email);
-        return "reset-password"; // ✅ HTML 반환 가능
+        return "reset-password";  // ✅ 정상적으로 reset-password.html 반환
     }
 
+    // ✅ 비밀번호 변경 요청 처리 (POST 요청)
     @PostMapping("/reset-password")
-    @ResponseBody  // ✅ 추가: JSON 응답을 위해 @ResponseBody 사용
+    @ResponseBody  // ✅ JSON 응답을 위해 @ResponseBody 사용
     public Map<String, Object> resetPassword(@RequestBody Map<String, String> requestData) {
         Map<String, Object> response = new HashMap<>();
         String email = requestData.get("email");
         String newPassword = requestData.get("newPassword");
+
+        // ✅ 입력값 검증
+        if (email == null || newPassword == null || email.trim().isEmpty() || newPassword.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "이메일과 새 비밀번호를 입력하세요.");
+            return response;
+        }
 
         // ✅ 이메일이 customer 또는 admin 테이블에 존재하는지 확인
         boolean isCustomer = customerMapper.checkEmailExists(email);
@@ -44,12 +55,12 @@ public class ResetPasswordController {
         }
 
         // ✅ 새 비밀번호 해싱 후 저장
-        String hashedPassword = PasswordUtil.hashPassword(newPassword);
+        String hashedPassword = PasswordUtil.hashPassword(newPassword);  // ✅ 해싱된 비밀번호
 
         if (isCustomer) {
-            customerMapper.updatePassword(email, hashedPassword);
+            customerMapper.updatePassword(email, hashedPassword);  // ✅ 'pwd'가 아니라 'hashedPassword' 사용
         } else if (isAdmin) {
-            adminMapper.updatePassword(email, hashedPassword);
+            adminMapper.updatePassword(email, hashedPassword);  // ✅ 'pwd'가 아니라 'hashedPassword' 사용
         }
 
         response.put("success", true);
