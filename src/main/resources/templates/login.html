@@ -62,15 +62,30 @@
     </style>
 
     <script>
-        // reCAPTCHA 로드 완료 후 호출되는 함수
-        function onRecaptchaLoad() {
-            console.log("reCAPTCHA 로드 완료!");
-            grecaptcha.render('recaptcha', {
-                'sitekey': '6LfH1ekqAAAAANBiO4A14_GD39CAYkiTEUC-chgT', // 실제 sitekey 입력
-                'theme': 'light'
-            });
-        }
-    </script>
+    // reCAPTCHA 로드 완료 후 호출되는 함수
+    function onRecaptchaLoad() {
+        console.log("🔄 reCAPTCHA 로드 완료! 사이트 키 가져오는 중...");
+
+        // 백엔드 API에서 sitekey 가져오기
+        fetch("/api/recaptcha/site-key")
+            .then(response => response.text())
+            .then(siteKey => {
+                if (!siteKey) {
+                    console.error("❌ reCAPTCHA sitekey를 가져오지 못했습니다!");
+                    return;
+                }
+                console.log("✅ reCAPTCHA sitekey:", siteKey);
+
+                // reCAPTCHA 렌더링 (가져온 sitekey 사용)
+                grecaptcha.render('recaptcha', {
+                    'sitekey': siteKey,
+                    'theme': 'light'
+                });
+            })
+            .catch(error => console.error("⚠️ reCAPTCHA 키 로드 중 오류 발생:", error));
+    }
+</script>
+
 </head>
 
 <body>

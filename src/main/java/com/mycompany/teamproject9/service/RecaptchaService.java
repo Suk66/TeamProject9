@@ -11,7 +11,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class RecaptchaService {
 
-    @Value("${recaptcha.secretkey}")
+   @Value("${recaptcha.site-key}")
+    private String siteKey;
+
+    @Value("${recaptcha.secret-key}")
     private String secretKey;
 
     private final RestTemplate restTemplate;
