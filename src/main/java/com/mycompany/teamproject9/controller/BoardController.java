@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
 
 @Controller
@@ -37,15 +38,17 @@ public String showWriteForm(Model model) {
     return "board/board-write";  // 게시글 작성 페이지
 }
 
-// 📌 게시글 수정 요청 처리 (POST)
+
 // 📌 게시글 작성 요청 처리 (POST)
 @PostMapping("/write")
 public String insert(@ModelAttribute Board board) {
-    boardMapper.insert(board);  // 새 게시글 DB에 저장
-    System.out.println("📌 [디버깅] 새 게시글 작성 완료! 제목: " + board.getTitle());
+    System.out.println("📌 [디버깅] 새 게시글 작성! 제목: " + board.getTitle() + ", 비밀번호: " + board.getPassword());
+
+    boardMapper.insert(board);  // ✅ 새 게시글 DB에 저장 (비밀번호 포함)
 
     return "redirect:/board";  // ✅ 작성 후 게시글 목록으로 이동
 }
+
 
 
 

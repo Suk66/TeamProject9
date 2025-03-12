@@ -26,7 +26,7 @@ public class ResetPasswordController {
             return "redirect:/find-password";  // ✅ email 값이 없으면 비밀번호 찾기 페이지로 이동
         }
         model.addAttribute("email", email);
-        return "reset-password";  // ✅ 정상적으로 reset-password.html 반환
+        return "find/reset-password";  // ✅ 정상적으로 reset-password.html 반환
     }
 
     // ✅ 비밀번호 변경 요청 처리 (POST 요청)

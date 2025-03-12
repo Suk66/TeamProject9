@@ -20,7 +20,7 @@ public class FindPasswordController {
     // ✅ 비밀번호 찾기 페이지(GET 요청 허용)
     @GetMapping("/find-password")
     public String showFindPasswordPage() {
-        return "find-password"; // ✅ HTML 반환 가능
+        return "find/find-password"; // ✅ HTML 반환 가능
     }
 
     @PostMapping("/find-password")

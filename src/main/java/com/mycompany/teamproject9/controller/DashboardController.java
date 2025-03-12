@@ -28,7 +28,7 @@ public class DashboardController {
         }
 
         model.addAttribute("username", user.toString());
-        return "customer-dashboard";
+        return "dashboard/customer-dashboard";
     }
 
     @GetMapping("/admin")
@@ -47,6 +47,6 @@ public class DashboardController {
         }
 
         model.addAttribute("username", user.toString());
-        return "admin-dashboard";
+        return "dashboard/admin-dashboard";
     }
 }

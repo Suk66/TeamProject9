@@ -19,7 +19,7 @@ public class FindEmailController {
 
     @GetMapping("/find-email")
     public String showFindEmailPage() {
-        return "find-email";  // 이메일 찾기 페이지 반환
+        return "find/find-email";  // 이메일 찾기 페이지 반환
     }
 
     @PostMapping("/find-email")
@@ -47,7 +47,7 @@ public String findEmail(@RequestParam("phone") String phone, RedirectAttributes 
 
     @GetMapping("/find-email-result")
     public String showEmailResultPage() {
-        return "find-email-result";  // ✅ 이메일 결과 페이지 반환
+        return "find/find-email-result";  // ✅ 이메일 결과 페이지 반환
     }
 
     // ✅ 이메일 마스킹 (abc@gmail.com → a**@g***.com)

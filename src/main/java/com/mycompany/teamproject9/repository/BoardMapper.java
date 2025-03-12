@@ -22,9 +22,10 @@ List<Board> findAll();
 
 
     // 2️⃣ 게시글 작성
-    @Insert("INSERT INTO board (title, content, writer, created_at) VALUES (#{title}, #{content}, #{writer}, NOW())")
+    @Insert("INSERT INTO board (title, content, writer, password, created_at) VALUES (#{title}, #{content}, #{writer}, #{password}, NOW())")
     @Options(useGeneratedKeys = true, keyProperty = "boardId")
     int insert(Board board);
+
 
     // 🔹 특정 게시글 조회
     @Select("SELECT board_id AS boardId, title, content, writer, created_at AS createdAt FROM board WHERE board_id = #{boardId}")
