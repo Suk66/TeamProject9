@@ -45,4 +45,9 @@ public interface AdminMapper {
     @Delete("DELETE FROM admin WHERE admin_email = #{email}")
     int deleteUser(@Param("email") String email);
 
+@Select("SELECT admin_name AS name, admin_email AS email, admin_phone AS phone, NULL AS addr, 'admin' AS userType FROM admin WHERE admin_email = #{email}")
+User findUserByEmail(@Param("email") String email);
+
+
+
 }

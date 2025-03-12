@@ -1,6 +1,7 @@
 package com.mycompany.teamproject9.controller;
 
 import com.mycompany.teamproject9.dto.LoginRequest;
+import com.mycompany.teamproject9.dto.User;
 import com.mycompany.teamproject9.service.RecaptchaService;
 import com.mycompany.teamproject9.repository.AdminMapper;
 import com.mycompany.teamproject9.repository.CustomerMapper;
@@ -53,8 +54,7 @@ public class LoginController {
 
         return "redirect:/login"; // 유효하지 않은 role이 있다면 로그인 페이지로 리다이렉트
     }
-
-   @PostMapping
+@PostMapping
 @ResponseBody
 public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
     Map<String, String> response = new HashMap<>();
@@ -63,22 +63,41 @@ public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest reque
     String email = request.getEmail();
     String password = request.getPwd();
     String storedPassword = null;
+    User user = null;
 
-    // 관리자 로그인 검증
+    // ✅ 관리자 로그인 검증
     storedPassword = adminMapper.findPasswordByEmail(email);
     if (storedPassword != null && PasswordUtil.checkPassword(password, storedPassword)) {
-        session.setAttribute("user", email);  // ✅ 세션에 이메일 저장
+        user = adminMapper.findUserByEmail(email);
+
+        // 🔥 디버깅: User 객체 확인
+        System.out.println("📌 [디버깅] findUserByEmail() 결과: " + user);
+        if (user != null) {
+            System.out.println("📌 [디버깅] 사용자 이름: " + user.getName());
+        }
+
+        session.setAttribute("user", user);
         session.setAttribute("role", "ROLE_ADMIN");
+
         response.put("message", "로그인 성공 (관리자)");
         response.put("role", "ROLE_ADMIN");
         return ResponseEntity.ok(response);
     }
 
-    // 일반회원 로그인 검증
+    // ✅ 일반회원 로그인 검증
     storedPassword = customerMapper.findPasswordByEmail(email);
     if (storedPassword != null && PasswordUtil.checkPassword(password, storedPassword)) {
-        session.setAttribute("user", email);  // ✅ 세션에 이메일 저장
+        user = customerMapper.findUserByEmail(email);
+
+        // 🔥 디버깅: User 객체 확인
+        System.out.println("📌 [디버깅] findUserByEmail() 결과: " + user);
+        if (user != null) {
+            System.out.println("📌 [디버깅] 사용자 이름: " + user.getName());
+        }
+
+        session.setAttribute("user", user);
         session.setAttribute("role", "ROLE_CUSTOMER");
+
         response.put("message", "로그인 성공 (일반회원)");
         response.put("role", "ROLE_CUSTOMER");
         return ResponseEntity.ok(response);
@@ -88,6 +107,8 @@ public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest reque
     response.put("message", "이메일 또는 비밀번호가 일치하지 않습니다.");
     return ResponseEntity.status(400).body(response);
 }
+
+
 
 
 }

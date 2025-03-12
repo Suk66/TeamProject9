@@ -48,6 +48,12 @@ public interface CustomerMapper {
     @Delete("DELETE FROM customer WHERE customer_email = #{email}")
     int deleteUser(@Param("email") String email);
 
+@Select("SELECT customer_name AS name, customer_email AS email, customer_phone AS phone, customer_addr AS addr, 'customer' AS userType FROM customer WHERE customer_email = #{email}")
+User findUserByEmail(@Param("email") String email);
+
+
+
+
 
 
 

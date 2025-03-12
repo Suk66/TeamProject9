@@ -35,20 +35,43 @@ public class BoardController {
 
     // 📌 게시글 작성 페이지 (GET 요청)
 @GetMapping("/write")
-public String showWriteForm(Model model) {
+public String showWriteForm(Model model, HttpSession session) {
     model.addAttribute("board", new Board()); // 빈 Board 객체 전달
+
+    // ✅ 세션에서 User 객체 가져오기
+    Object userObj = session.getAttribute("user");
+
+    if (userObj == null) {
+        System.out.println("📌 [디버깅] 세션에 사용자 정보 없음! (user == null)");
+    } else if (userObj instanceof User) {
+        User loggedInUser = (User) userObj;
+        model.addAttribute("loggedInUser", loggedInUser);
+        System.out.println("📌 [디버깅] 모델에 추가된 사용자 이름: " + loggedInUser.getName());
+    } else {
+        System.out.println("❌ [디버깅] 세션에 저장된 데이터 타입이 예상과 다름: " + userObj.getClass().getName());
+    }
+
     return "board/board-write";  // 게시글 작성 페이지
 }
 
 
+
+
 // 📌 게시글 작성 요청 처리 (POST)
 @PostMapping("/write")
-public String insert(@ModelAttribute Board board) {
-    System.out.println("📌 [디버깅] 새 게시글 작성! 제목: " + board.getTitle() + ", 비밀번호: " + board.getPassword());
+public String insert(@ModelAttribute Board board, HttpSession session) {
+    User loggedInUser = (User) session.getAttribute("user");
 
-    boardMapper.insert(board);  // ✅ 새 게시글 DB에 저장 (비밀번호 포함)
+    if (loggedInUser != null) {
+        board.setWriter(loggedInUser.getEmail());  // ✅ DB에는 email 저장
+    } else if (board.getWriter() == null || board.getWriter().isEmpty()) {
+        return "redirect:/board/write?error=missing_writer";
+    }
 
-    return "redirect:/board";  // ✅ 작성 후 게시글 목록으로 이동
+    System.out.println("📌 [디버깅] 새 게시글 작성! 제목: " + board.getTitle() + ", 작성자(이메일): " + board.getWriter());
+
+    boardMapper.insert(board);
+    return "redirect:/board";
 }
 
 
@@ -80,38 +103,33 @@ public String editBoard(
         HttpSession session,
         Model model) {
 
-    // 📌 게시글 가져오기
     Board board = boardMapper.findById(boardId);
 
     if (board == null) {
-        return "redirect:/board"; // 게시글이 없으면 목록으로 이동
+        return "redirect:/board";
     }
 
-    // ✅ 로그인한 사용자는 비밀번호 확인 필요 없음
-    User loggedInUser = (User) session.getAttribute("user");
-    if (loggedInUser != null && loggedInUser.getEmail().equals(board.getWriter())) {
-        model.addAttribute("board", board);
-        return "board/board-edit";
+    Object userObj = session.getAttribute("user");
+    if (userObj instanceof User) {
+        User loggedInUser = (User) userObj;
+        if (loggedInUser.getName().equals(board.getWriter())) {
+            model.addAttribute("board", board);
+            return "board/board-edit"; // ✅ 바로 수정 가능
+        }
     }
 
-    // ✅ 디버깅 로그 추가
-    System.out.println("📌 [디버깅] 입력한 비밀번호: '" + password + "'");
-    System.out.println("📌 [디버깅] 저장된 비밀번호: '" + board.getPassword() + "'");
-
-    // ✅ 비로그인 사용자는 비밀번호 입력해야 함
     if (password == null || !password.equals(board.getPassword())) {
-        System.out.println("❌ [오류] 비밀번호 불일치!");
-        return "redirect:/board?error=invalid_password"; // 🚨 비밀번호가 틀리면 목록으로 이동
+        return "redirect:/board/check-password/" + boardId + "?error=invalid_password";
     }
 
-    // ✅ 비밀번호가 맞으면 수정 페이지로 이동
     model.addAttribute("board", board);
-    return "board/password-check";
+    return "board/board-edit";
 }
-
 // 📌 게시글 수정 요청 처리 (POST)
 @PostMapping("/edit/{id}")
-public String updateBoard(@PathVariable("id") int boardId, @ModelAttribute Board board) {
+public String updateBoard(
+        @PathVariable("id") int boardId,
+        @ModelAttribute Board board) {
     board.setBoardId(boardId);  // ✅ URL에서 받은 boardId 설정
 
     int updatedRows = boardMapper.update(board);
@@ -152,6 +170,7 @@ public String showPasswordCheckPage(@PathVariable("id") int boardId, Model model
 public String checkPassword(
         @RequestParam("boardId") int boardId,
         @RequestParam("password") String password,
+        HttpSession session,
         Model model) {
 
     // 게시글 정보 조회
@@ -160,12 +179,20 @@ public String checkPassword(
         return "redirect:/board?error=not_found";  // 게시글이 없으면 목록으로 이동
     }
 
-    // 비밀번호 검증
+    User loggedInUser = (User) session.getAttribute("user");
+
+    // ✅ 로그인한 사용자가 본인의 게시글을 수정하는 경우 → 비밀번호 없이 수정 가능
+    if (loggedInUser != null && loggedInUser.getEmail().equals(board.getWriter())) {
+        model.addAttribute("board", board);
+        return "board/board-edit"; // 바로 수정 페이지로 이동
+    }
+
+    // ✅ 비로그인 사용자는 비밀번호 확인 후 수정 가능
     if (!board.getPassword().equals(password)) {
         return "redirect:/board/check-password/" + boardId + "?error=invalid_password";  // 비밀번호 틀림
     }
 
-    // 비밀번호가 맞으면 수정 페이지로 이동
+    // ✅ 비밀번호가 맞으면 수정 페이지로 이동
     model.addAttribute("board", board);
     return "board/board-edit";
 }
