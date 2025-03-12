@@ -33,19 +33,20 @@
 
   <p>📌 게시글 작성자 이메일: <span th:text="${board.writer}"></span></p>
 
-  <!-- 📌 로그인한 사용자 == 작성자 (비밀번호 없이 수정 가능) -->
-  <a th:if="${session.user != null and session.user.email == board.writer}"
-     th:href="@{/board/edit/{id}(id=${board.boardId})}"
-     class="btn btn-warning">
-      수정
-  </a>
+  <!-- 📌 로그인한 사용자 == 작성자 (수정 가능) -->
+<a th:if="${session.user != null and session.user.email == board.writer}"
+   th:href="@{/board/edit/{id}(id=${board.boardId})}"
+   class="btn btn-warning">
+    수정
+</a>
 
-  <!-- 📌 비로그인 사용자 또는 작성자가 아닌 경우 (비밀번호 입력 필요) -->
-  <a th:if="${session.user == null or session.user.email != board.writer}"
-     th:href="@{/board/check-password/{id}(id=${board.boardId})}"
-     class="btn btn-warning">
-      수정 (비밀번호 입력)
-  </a>
+<!-- 📌 비로그인 상태에서 비로그인 작성 글만 수정 가능 -->
+<a th:if="${session.user == null and #strings.contains(board.writer, '@') == false}"
+   th:href="@{/board/check-password/{id}(id=${board.boardId})}"
+   class="btn btn-warning">
+    수정 (비밀번호 입력)
+</a>
+
 
   <button class="btn btn-danger" th:attr="onclick='deleteBoard(' + ${board.boardId} + ')'" >삭제</button>
 </div>
