@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 수정</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    * { font-family: "Merriweather", serif; }
+    .mytitle { height: 200px; color: white; display: flex; align-items: center; justify-content: center; background-color: #343a40; }
+    .mypostingbox { width: 60%; margin: 30px auto; padding: 20px; box-shadow: 0px 0px 5px 0px gray; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<div class="mytitle">
+  <h1>게시글 수정</h1>
+</div>
+
+<div class="mypostingbox">
+  <!-- ✅ 게시글 수정 폼 -->
+  <form th:action="@{/board/edit/{id}(id=${board.boardId})}" method="post">
+    <!-- 제목 입력 필드 -->
+    <div class="mb-3">
+      <label for="title" class="form-label"><strong>제목</strong></label>
+      <input type="text" id="title" name="title" class="form-control" th:value="${board.title}" required>
+    </div>
+
+    <!-- 내용 입력 필드 -->
+    <div class="mb-3">
+      <label for="content" class="form-label"><strong>내용</strong></label>
+      <textarea id="content" name="content" class="form-control" rows="5" required>[[${board.content}]]</textarea>
+    </div>
+
+    <!-- 버튼 영역 -->
+    <div class="d-flex justify-content-between">
+      <a th:href="@{/board/{id}(id=${board.boardId})}" class="btn btn-outline-dark">뒤로가기</a>
+      <button type="submit" class="btn btn-warning">수정 완료</button>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>

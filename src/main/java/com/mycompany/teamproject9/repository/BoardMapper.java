@@ -26,9 +26,12 @@ List<Board> findAll();
     @Options(useGeneratedKeys = true, keyProperty = "boardId")
     int insert(Board board);
 
-    // 3️⃣ 특정 게시글 조회
-    @Select("SELECT * FROM board WHERE board_id = #{boardId}")
+    // 🔹 특정 게시글 조회
+    @Select("SELECT board_id AS boardId, title, content, writer, created_at AS createdAt FROM board WHERE board_id = #{boardId}")
     Board findById(@Param("boardId") int boardId);
+
+
+
 
     // 4️⃣ 게시글 삭제
     @Delete("DELETE FROM board WHERE board_id = #{boardId}")
