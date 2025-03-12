@@ -30,6 +30,25 @@ public class BoardController {
         return "board/board-list";
     }
 
+    // 📌 게시글 작성 페이지 (GET 요청)
+@GetMapping("/write")
+public String showWriteForm(Model model) {
+    model.addAttribute("board", new Board()); // 빈 Board 객체 전달
+    return "board/board-write";  // 게시글 작성 페이지
+}
+
+// 📌 게시글 수정 요청 처리 (POST)
+// 📌 게시글 작성 요청 처리 (POST)
+@PostMapping("/write")
+public String insert(@ModelAttribute Board board) {
+    boardMapper.insert(board);  // 새 게시글 DB에 저장
+    System.out.println("📌 [디버깅] 새 게시글 작성 완료! 제목: " + board.getTitle());
+
+    return "redirect:/board";  // ✅ 작성 후 게시글 목록으로 이동
+}
+
+
+
     // 📌 게시글 상세 보기
     @GetMapping("/{id}")
     public String boardDetail(@PathVariable("id") int boardId, Model model) {
