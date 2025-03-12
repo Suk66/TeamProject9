@@ -97,6 +97,43 @@ public class AccountController {
 
         return response;
     }
+    @PostMapping("/delete")
+@ResponseBody
+public Map<String, Object> deleteUser(HttpSession session) {
+    Map<String, Object> response = new HashMap<>();
+
+    // ✅ 세션에서 로그인한 사용자의 이메일 가져오기
+    String email = (String) session.getAttribute("user");
+    if (email == null) {
+        response.put("success", false);
+        response.put("message", "로그인이 필요합니다.");
+        return response;
+    }
+
+    // ✅ 세션에서 userType 가져오기
+    String userType = (String) session.getAttribute("userType");
+    if (userType == null) {
+        response.put("success", false);
+        response.put("message", "회원 유형을 확인할 수 없습니다.");
+        return response;
+    }
+
+    // ✅ 사용자 삭제 로직 실행
+    boolean isDeleted = userService.deleteUser(email, userType);
+    System.out.println("📌 [디버깅] 회원 삭제 결과: " + isDeleted);
+
+    if (isDeleted) {
+        session.invalidate();  // ✅ 삭제 후 세션 종료
+        response.put("success", true);
+        response.put("message", "회원 탈퇴가 완료되었습니다.");
+    } else {
+        response.put("success", false);
+        response.put("message", "회원 삭제 실패.");
+    }
+
+    return response;
+}
+
 
 
 }

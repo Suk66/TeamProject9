@@ -35,5 +35,19 @@ public class UserService {
          System.out.println("📌 [디버깅] rowsAffected: " + rowsAffected);
         return rowsAffected > 0; // 업데이트 성공 여부 반환
     }
+
+    public boolean deleteUser(String email, String userType) {
+    int rowsAffected = 0;
+
+    if ("customer".equals(userType)) {
+        rowsAffected = customerMapper.deleteUser(email);
+    } else if ("admin".equals(userType)) {
+        rowsAffected = adminMapper.deleteUser(email);
+    }
+
+    System.out.println("📌 [디버깅] 삭제된 행 수: " + rowsAffected);
+    return rowsAffected > 0;
+}
+
 }
 

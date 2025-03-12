@@ -2,10 +2,7 @@ package com.mycompany.teamproject9.repository;
 
 import com.mycompany.teamproject9.dto.CreateRequest;
 import com.mycompany.teamproject9.dto.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 public interface AdminMapper {
     @Insert("insert into admin (admin_name,admin_pwd,admin_email,admin_phone,role)"+
@@ -44,4 +41,8 @@ public interface AdminMapper {
 
     @Update("UPDATE admin SET admin_name = #{name}, admin_phone = #{phone} WHERE admin_email = #{email}")
     int updateUser(User user);
+
+    @Delete("DELETE FROM admin WHERE admin_email = #{email}")
+    int deleteUser(@Param("email") String email);
+
 }
