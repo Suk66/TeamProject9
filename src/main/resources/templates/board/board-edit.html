@@ -56,12 +56,13 @@
                 삭제
             </button>
 
-           <!-- 비로그인 상태에서 비로그인 게시글 삭제 (비밀번호 입력 필요) -->
-<button th:if="${session.user == null and #strings.contains(board.writer, '@') == false}"
+<!-- 비로그인 상태에서 비로그인 게시글 삭제 (비밀번호 입력 필요) -->
+<button th:if="${session.user == null and #strings.contains(board.writer, '@') == false or (session.user != null and #strings.contains(board.writer, '@') == false)}"
         type="button" class="btn btn-danger"
         th:onclick="|confirmDeleteWithPassword(${board.boardId})|">
     삭제 (비밀번호 입력)
 </button>
+
 
 
 
