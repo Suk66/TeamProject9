@@ -96,6 +96,8 @@ document.getElementById("updateForm").addEventListener("submit", function (event
         addr: document.getElementById("addr") ? document.getElementById("addr").value : ""
     };
 
+    console.log("📌 [디버깅] 서버로 보낼 데이터:", userData);  // ✅ 요청 데이터 확인
+
     fetch("/account/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -103,6 +105,7 @@ document.getElementById("updateForm").addEventListener("submit", function (event
     })
     .then(response => response.json())
     .then(data => {
+        console.log("📌 [디버깅] 서버 응답:", data);  // ✅ 서버 응답 확인
         alert(data.message);
         if (data.success) {
             window.location.href = "/account/update"; // 성공 후 다시 수정 페이지로 이동

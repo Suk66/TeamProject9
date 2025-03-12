@@ -41,6 +41,8 @@ public class AccountController {
             response.put("success", false);
             response.put("message", "사용자 정보를 찾을 수 없습니다.");
         } else {
+            // ✅ 세션에 userType 저장
+            session.setAttribute("userType", user.getUserType());
             response.put("success", true);
             response.put("user", user);
         }
@@ -65,9 +67,25 @@ public class AccountController {
             return response;
         }
 
+        // ✅ 세션에서 userType 가져오기
+    String userType = (String) session.getAttribute("userType");
+    if (userType == null) {
+        response.put("success", false);
+        response.put("message", "회원 유형을 확인할 수 없습니다.");
+        return response;
+    }
+
         // ✅ 업데이트할 데이터 설정
         updatedUser.setEmail(email); // 이메일은 변경 불가
+        updatedUser.setUserType(userType);
+
+        System.out.println("📌 [디버깅] 업데이트 요청 데이터: " + updatedUser);
+        System.out.println("📌 [디버깅] updatedUser.getUserType(): " + updatedUser.getUserType());
+
         boolean isUpdated = userService.updateUserInfo(updatedUser);
+
+        System.out.println("📌 [디버깅] 업데이트 결과: " + isUpdated);
+
 
         if (isUpdated) {
             response.put("success", true);
