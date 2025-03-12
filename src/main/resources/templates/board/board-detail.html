@@ -33,19 +33,33 @@
 
   <p>📌 게시글 작성자 이메일: <span th:text="${board.writer}"></span></p>
 
-  <!-- 📌 로그인한 사용자 == 작성자 (수정 가능) -->
+<!-- 📌 로그인한 사용자 == 작성자 (수정 가능) -->
 <a th:if="${session.user != null and session.user.email == board.writer}"
    th:href="@{/board/edit/{id}(id=${board.boardId})}"
    class="btn btn-warning">
     수정
 </a>
 
-<!-- 📌 비로그인 상태에서 비로그인 작성 글만 수정 가능 -->
-<a th:if="${session.user == null and #strings.contains(board.writer, '@') == false}"
+<!-- 📌 비로그인 상태에서 비로그인 작성 글만 수정 가능 (비밀번호 입력 필요) -->
+<a th:if="${session.user == null and board.writer != null and board.writer.indexOf('@') == -1}"
    th:href="@{/board/check-password/{id}(id=${board.boardId})}"
    class="btn btn-warning">
     수정 (비밀번호 입력)
 </a>
+
+<!-- 📌 로그인 상태에서 비로그인 작성 글만 수정 가능 (비밀번호 입력 필요) -->
+<a th:if="${session.user != null and board.writer != null and board.writer.indexOf('@') == -1}"
+   th:href="@{/board/check-password/{id}(id=${board.boardId})}"
+   class="btn btn-warning">
+    수정 (비밀번호 입력)
+</a>
+
+
+
+
+
+
+
 
 
 
