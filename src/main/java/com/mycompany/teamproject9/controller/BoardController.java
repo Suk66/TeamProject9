@@ -4,13 +4,16 @@ import com.mycompany.teamproject9.dto.Board;
 import com.mycompany.teamproject9.dto.User;
 import com.mycompany.teamproject9.repository.BoardMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/board")
@@ -147,20 +150,52 @@ public String updateBoard(
 }
 
 
-    // 📌 게시글 삭제 기능
-    @PostMapping("/delete/{id}")
-    public String deleteBoard(@PathVariable("id") int boardId) {
-        System.out.println("📌 [디버깅] 삭제할 게시글 ID: " + boardId);
-        int result = boardMapper.delete(boardId);
+@PostMapping("/delete/{id}")
+@ResponseBody  // ✅ JSON 응답을 반환하도록 변경
+public Map<String, Object> deleteBoard(@PathVariable("id") int boardId, HttpSession session) {
+    Map<String, Object> response = new HashMap<>();
+    System.out.println("📌 [디버깅] 삭제 요청 ID: " + boardId);
 
-        if (result > 0) {
-            System.out.println("✅ 게시글 삭제 완료!");
-        } else {
-            System.out.println("❌ 게시글 삭제 실패!");
-        }
-
-        return "redirect:/board"; // 삭제 후 목록으로 이동
+    Object userObj = session.getAttribute("user");
+    if (!(userObj instanceof User)) {
+        System.out.println("❌ [오류] 로그인한 사용자가 아님");
+        response.put("success", false);
+        response.put("message", "로그인이 필요합니다.");
+        return response;
     }
+
+    User loggedInUser = (User) userObj;
+    Board board = boardMapper.findById(boardId);
+
+    if (board == null) {
+        System.out.println("❌ [오류] 삭제하려는 게시글이 존재하지 않음!");
+        response.put("success", false);
+        response.put("message", "삭제하려는 게시글이 존재하지 않습니다.");
+        return response;
+    }
+
+    if (!board.getWriter().equals(loggedInUser.getEmail())) {
+        System.out.println("❌ [오류] 다른 사용자의 게시글을 삭제할 수 없음!");
+        response.put("success", false);
+        response.put("message", "다른 사용자의 게시글은 삭제할 수 없습니다.");
+        return response;
+    }
+
+    int result = boardMapper.delete(boardId);
+    if (result > 0) {
+        System.out.println("✅ [디버깅] 게시글 삭제 완료! ID: " + boardId);
+        response.put("success", true);
+        response.put("message", "게시글이 삭제되었습니다.");
+    } else {
+        System.out.println("❌ [오류] 게시글 삭제 실패!");
+        response.put("success", false);
+        response.put("message", "게시글 삭제 실패! 다시 시도하세요.");
+    }
+    return response;
+}
+
+
+
 
 // 📌 비밀번호 입력 화면으로 이동
 @GetMapping("/check-password/{id}")
@@ -199,6 +234,22 @@ public String checkPassword(
     // ✅ 비밀번호가 맞으면 수정 페이지로 이동
     model.addAttribute("board", board);
     return "board/board-edit";
+}
+
+@PostMapping("/check-password-before-delete")
+public ResponseEntity<?> checkPasswordBeforeDelete(@RequestBody Map<String, String> data) {
+    int boardId = Integer.parseInt(data.get("boardId"));
+    String password = data.get("password");
+
+    Board board = boardMapper.findById(boardId);
+    if (board == null) return ResponseEntity.status(404).body("게시글이 존재하지 않습니다.");
+
+    if (!board.getPassword().equals(password)) {
+        return ResponseEntity.status(400).body("비밀번호가 틀렸습니다.");
+    }
+
+    boardMapper.delete(boardId);
+    return ResponseEntity.ok("삭제 성공");
 }
 
 

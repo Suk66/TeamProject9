@@ -32,23 +32,49 @@
         </div>
 
         <!-- 버튼 영역 -->
-<div class="d-flex justify-content-between">
-    <!-- 뒤로가기 버튼 -->
-    <a th:href="@{/board/{id}(id=${board.boardId})}" class="btn btn-outline-dark">뒤로가기</a>
+        <div class="d-flex justify-content-between">
+            <!-- 뒤로가기 버튼 -->
+            <a th:href="@{/board/{id}(id=${board.boardId})}" class="btn btn-outline-dark">뒤로가기</a>
 
-    <!-- ✅ 로그인한 사용자 == 작성자 (바로 수정 가능) -->
-    <button th:if="${session.user != null and session.user.email == board.writer}"
-            type="submit"
-            class="btn btn-primary">
-        수정 완료
-    </button>
+            <!-- ✅ 로그인한 사용자 == 작성자 (바로 수정 가능) -->
+            <button th:if="${session.user != null and session.user.email == board.writer}"
+                    type="submit"
+                    class="btn btn-warning">
+                변경사항 저장
+            </button>
 
-    <!-- ✅ 비로그인 사용자 또는 작성자가 아닌 경우 (비밀번호 입력 필요) -->
-    <button th:unless="${session.user != null and session.user.email == board.writer}"
-            class="btn btn-warning"
-            onclick="showPasswordPrompt([[${board.boardId}]])">
-        수정
-    </button>
+            <!-- ✅ 비로그인 사용자 또는 작성자가 아닌 경우 (비밀번호 입력 필요) -->
+            <button th:unless="${session.user != null and session.user.email == board.writer}"
+                    class="btn btn-warning"
+                    onclick="showPasswordPrompt([[${board.boardId}]])">
+                변경사항 저장
+            </button>
+
+           <button type="button" class="btn btn-danger"
+        th:onclick="|confirmDelete(${board.boardId}, event)|">
+    삭제
+</button>
+
+
+
+
+
+
+
+
+
+
+
+            <!-- 📌 비로그인 상태에서 비로그인 작성 글만 삭제 가능 (비밀번호 인증 필요) -->
+            <button th:if="${session.user == null and #strings.contains(board.writer, '@') == false}"
+                    class="btn btn-danger"
+                    onclick="confirmDeleteWithPassword([[${board.boardId}]])">
+                삭제 (비밀번호 입력)
+            </button>
+
+
+
+
 </div>
 
     </form>
@@ -61,7 +87,69 @@
             window.location.href = `/board/edit/${boardId}?password=` + encodeURIComponent(password);
         }
     }
+
+
+
+    function confirmDelete(boardId, event) {
+    event.preventDefault();  // 페이지 리디렉션을 막는 부분
+
+    if (!confirm("정말 삭제하시겠습니까?")) {
+        console.log("✅ 삭제 취소됨");
+        return; // 취소 시 아무 동작도 하지 않음
+    }
+
+    fetch(`/board/delete/${boardId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.href = "/board";  // 삭제 후 목록으로 이동
+        } else {
+            alert("❌ 삭제 실패: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("❌ [오류] 삭제 요청 실패:", error);
+        alert("삭제 실패! 다시 시도하세요.");
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+function confirmDeleteWithPassword(boardId) {
+    const password = prompt("게시글 비밀번호를 입력하세요:");
+    if (!password) return;
+
+    fetch(`/board/check-password-before-delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ boardId, password })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("비밀번호가 틀렸습니다.");
+            return response.text();
+        })
+        .then(() => {
+            alert("게시글이 삭제되었습니다.");
+            window.location.href = "/board";
+        })
+        .catch(error => alert(error.message));
+}
+
 </script>
+
+
 
 </body>
 </html>
