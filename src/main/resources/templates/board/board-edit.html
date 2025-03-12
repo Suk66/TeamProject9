@@ -32,15 +32,25 @@
         </div>
 
         <!-- 버튼 영역 -->
-        <div class="d-flex justify-content-between">
-            <a th:href="@{/board/{id}(id=${board.boardId})}" class="btn btn-outline-dark">뒤로가기</a>
-            <!-- 비로그인 사용자는 비밀번호 입력 후 수정 -->
-            <button th:unless="${session.user != null and session.user.email == board.writer}"
-                    class="btn btn-warning"
-                    onclick="showPasswordPrompt([[${board.boardId}]])">
-                수정
-            </button>
-        </div>
+<div class="d-flex justify-content-between">
+    <!-- 뒤로가기 버튼 -->
+    <a th:href="@{/board/{id}(id=${board.boardId})}" class="btn btn-outline-dark">뒤로가기</a>
+
+    <!-- ✅ 로그인한 사용자 == 작성자 (바로 수정 가능) -->
+    <button th:if="${session.user != null and session.user.email == board.writer}"
+            type="submit"
+            class="btn btn-primary">
+        수정 완료
+    </button>
+
+    <!-- ✅ 비로그인 사용자 또는 작성자가 아닌 경우 (비밀번호 입력 필요) -->
+    <button th:unless="${session.user != null and session.user.email == board.writer}"
+            class="btn btn-warning"
+            onclick="showPasswordPrompt([[${board.boardId}]])">
+        수정
+    </button>
+</div>
+
     </form>
 </div>
 

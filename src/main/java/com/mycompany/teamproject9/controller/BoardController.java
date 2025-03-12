@@ -34,25 +34,25 @@ public class BoardController {
     }
 
     // 📌 게시글 작성 페이지 (GET 요청)
-@GetMapping("/write")
-public String showWriteForm(Model model, HttpSession session) {
-    model.addAttribute("board", new Board()); // 빈 Board 객체 전달
+    @GetMapping("/write")
+    public String showWriteForm(Model model, HttpSession session) {
+        model.addAttribute("board", new Board()); // 빈 Board 객체 전달
 
-    // ✅ 세션에서 User 객체 가져오기
-    Object userObj = session.getAttribute("user");
+        // ✅ 세션에서 User 객체 가져오기
+        Object userObj = session.getAttribute("user");
 
-    if (userObj == null) {
-        System.out.println("📌 [디버깅] 세션에 사용자 정보 없음! (user == null)");
-    } else if (userObj instanceof User) {
-        User loggedInUser = (User) userObj;
-        model.addAttribute("loggedInUser", loggedInUser);
-        System.out.println("📌 [디버깅] 모델에 추가된 사용자 이름: " + loggedInUser.getName());
-    } else {
-        System.out.println("❌ [디버깅] 세션에 저장된 데이터 타입이 예상과 다름: " + userObj.getClass().getName());
+        if (userObj == null) {
+            System.out.println("📌 [디버깅] 세션에 사용자 정보 없음! (user == null)");
+        } else if (userObj instanceof User) {
+            User loggedInUser = (User) userObj;
+            model.addAttribute("loggedInUser", loggedInUser);
+            System.out.println("📌 [디버깅] 모델에 추가된 사용자 이름: " + loggedInUser.getName());
+        } else {
+            System.out.println("❌ [디버깅] 세션에 저장된 데이터 타입이 예상과 다름: " + userObj.getClass().getName());
+        }
+
+        return "board/board-write";  // 게시글 작성 페이지
     }
-
-    return "board/board-write";  // 게시글 작성 페이지
-}
 
 
 
@@ -78,53 +78,57 @@ public String insert(@ModelAttribute Board board, HttpSession session) {
 
 
     // 📌 게시글 상세 보기
-@GetMapping("/{id}")
-public String boardDetail(@PathVariable("id") int boardId, Model model) {
-    System.out.println("📌 [디버깅] 요청된 게시글 ID: " + boardId);
+    @GetMapping("/{id}")
+    public String boardDetail(@PathVariable("id") int boardId, Model model) {
+        System.out.println("📌 [디버깅] 요청된 게시글 ID: " + boardId);
 
-    Board board = boardMapper.findById(boardId);
+        Board board = boardMapper.findById(boardId);
 
-    if (board == null) {
-        System.out.println("❌ [오류] 게시글을 찾을 수 없음! ID: " + boardId);
-        return "redirect:/board";
+        if (board == null) {
+            System.out.println("❌ [오류] 게시글을 찾을 수 없음! ID: " + boardId);
+            return "redirect:/board";
+        }
+
+        System.out.println("📌 [디버깅] 조회된 게시글 ID: " + board.getBoardId());
+
+        model.addAttribute("board", board);
+        return "board/board-detail";
     }
-
-    System.out.println("📌 [디버깅] 조회된 게시글 ID: " + board.getBoardId());
-
-    model.addAttribute("board", board);
-    return "board/board-detail";
-}
 
 // 📌 게시글 수정 페이지 (GET)
 @GetMapping("/edit/{id}")
 public String editBoard(
         @PathVariable("id") int boardId,
-        @RequestParam(value = "password", required = false) String password,
         HttpSession session,
         Model model) {
 
     Board board = boardMapper.findById(boardId);
-
     if (board == null) {
-        return "redirect:/board";
+        return "redirect:/board"; // 게시글이 없으면 목록으로 이동
     }
 
+    // ✅ 로그인한 사용자 정보 가져오기
     Object userObj = session.getAttribute("user");
     if (userObj instanceof User) {
         User loggedInUser = (User) userObj;
-        if (loggedInUser.getName().equals(board.getWriter())) {
+
+        System.out.println("📌 [디버깅] 로그인한 사용자 이메일: " + loggedInUser.getEmail());
+        System.out.println("📌 [디버깅] 게시글 작성자 이메일: " + board.getWriter());
+
+        // 🚀 **로그인한 사용자가 작성자일 경우 → 바로 수정 페이지로 이동**
+        if (board.getWriter().equals(loggedInUser.getEmail())) {
+            System.out.println("✅ [디버깅] 사용자 이메일이 일치! 바로 수정 페이지로 이동");
             model.addAttribute("board", board);
-            return "board/board-edit"; // ✅ 바로 수정 가능
+            return "board/board-edit";
         }
     }
 
-    if (password == null || !password.equals(board.getPassword())) {
-        return "redirect:/board/check-password/" + boardId + "?error=invalid_password";
-    }
-
-    model.addAttribute("board", board);
-    return "board/board-edit";
+    // ❌ **작성자가 아니거나 비로그인 상태 → 비밀번호 입력 페이지로 이동**
+    System.out.println("❌ [디버깅] 비밀번호 입력 필요! 비밀번호 확인 페이지로 이동");
+    return "redirect:/board/check-password/" + boardId;
 }
+
+
 // 📌 게시글 수정 요청 처리 (POST)
 @PostMapping("/edit/{id}")
 public String updateBoard(
@@ -144,19 +148,19 @@ public String updateBoard(
 
 
     // 📌 게시글 삭제 기능
-@PostMapping("/delete/{id}")
-public String deleteBoard(@PathVariable("id") int boardId) {
-    System.out.println("📌 [디버깅] 삭제할 게시글 ID: " + boardId);
-    int result = boardMapper.delete(boardId);
+    @PostMapping("/delete/{id}")
+    public String deleteBoard(@PathVariable("id") int boardId) {
+        System.out.println("📌 [디버깅] 삭제할 게시글 ID: " + boardId);
+        int result = boardMapper.delete(boardId);
 
-    if (result > 0) {
-        System.out.println("✅ 게시글 삭제 완료!");
-    } else {
-        System.out.println("❌ 게시글 삭제 실패!");
+        if (result > 0) {
+            System.out.println("✅ 게시글 삭제 완료!");
+        } else {
+            System.out.println("❌ 게시글 삭제 실패!");
+        }
+
+        return "redirect:/board"; // 삭제 후 목록으로 이동
     }
-
-    return "redirect:/board"; // 삭제 후 목록으로 이동
-}
 
 // 📌 비밀번호 입력 화면으로 이동
 @GetMapping("/check-password/{id}")
