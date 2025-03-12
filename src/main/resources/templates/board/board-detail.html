@@ -26,7 +26,12 @@
   <a href="/board" class="btn btn-outline-dark">목록으로</a>
   <!-- 수정 & 삭제 버튼 추가 -->
 
-  <a th:href="@{/board/edit/{id}(id=${board.boardId})}" class="btn btn-warning">수정</a>
+  <!-- 비로그인 사용자는 비밀번호 입력 후 수정 -->
+<a th:unless="${session.user != null and session.user.email == board.writer}"
+   th:href="@{/board/check-password/{id}(id=${board.boardId})}"
+   class="btn btn-warning">
+    수정
+</a>
   <button class="btn btn-danger" th:attr="onclick='deleteBoard(' + ${board.boardId} + ')'" >삭제</button>
 
 </div>
@@ -39,6 +44,8 @@
         </a>
     </td>
 </tr>
+
+<p>📌 게시글 ID 확인: <span th:text="${board.boardId}"></span></p>
 
 
 
