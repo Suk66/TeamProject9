@@ -237,20 +237,68 @@ public String checkPassword(
 }
 
 @PostMapping("/check-password-before-delete")
+@ResponseBody
 public ResponseEntity<?> checkPasswordBeforeDelete(@RequestBody Map<String, String> data) {
     int boardId = Integer.parseInt(data.get("boardId"));
     String password = data.get("password");
 
+    // 게시글 조회
     Board board = boardMapper.findById(boardId);
-    if (board == null) return ResponseEntity.status(404).body("게시글이 존재하지 않습니다.");
+    if (board == null) {
+        return ResponseEntity.status(404).body("게시글이 존재하지 않습니다.");
+    }
 
+    // 비밀번호 확인
     if (!board.getPassword().equals(password)) {
         return ResponseEntity.status(400).body("비밀번호가 틀렸습니다.");
     }
 
-    boardMapper.delete(boardId);
-    return ResponseEntity.ok("삭제 성공");
+    // 비밀번호가 맞다면 삭제
+    int result = boardMapper.delete(boardId);
+    if (result > 0) {
+        return ResponseEntity.ok(new HashMap<String, Object>() {{
+            put("success", true);
+            put("message", "게시글이 삭제되었습니다.");
+        }});
+    } else {
+        return ResponseEntity.status(500).body("게시글 삭제 실패!");
+    }
 }
+
+@PostMapping("/check-password-for-login-delete")
+@ResponseBody
+public ResponseEntity<?> checkPasswordForLoginDelete(@RequestBody Map<String, String> data, HttpSession session) {
+    String password = data.get("password");
+
+    // 로그인한 사용자 정보 가져오기
+    User loggedInUser = (User) session.getAttribute("user");
+    if (loggedInUser == null) {
+        return ResponseEntity.status(400).body("로그인 필요");
+    }
+
+    // 비밀번호 확인
+    if (!loggedInUser.getPassword().equals(password)) {
+        return ResponseEntity.status(400).body("비밀번호가 틀렸습니다.");
+    }
+
+    // 게시글 삭제
+    int boardId = Integer.parseInt(data.get("boardId"));
+    Board board = boardMapper.findById(boardId);
+    if (board == null) {
+        return ResponseEntity.status(404).body("게시글이 존재하지 않습니다.");
+    }
+
+    int result = boardMapper.delete(boardId);
+    if (result > 0) {
+        return ResponseEntity.ok(new HashMap<String, Object>() {{
+            put("success", true);
+            put("message", "게시글이 삭제되었습니다.");
+        }});
+    } else {
+        return ResponseEntity.status(500).body("게시글 삭제 실패!");
+    }
+}
+
 
 
 

@@ -11,4 +11,7 @@ public class User {
     private String phone;
     private String addr;     // 관리자는 null 가능
     private String userType; // "customer" 또는 "admin"
+
+    private String password; // 추가된 비밀번호 필드
 }
+
