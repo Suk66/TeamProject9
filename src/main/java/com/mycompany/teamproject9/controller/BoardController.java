@@ -77,11 +77,22 @@ public String updateBoard(@PathVariable("id") int boardId, @ModelAttribute Board
 }
 
 
-    // 📌 게시글 삭제 요청 처리
-    @PostMapping("/delete/{id}")
-    public String deleteBoard(@PathVariable("id") int boardId) {
-        boardMapper.delete(boardId);
-        return "redirect:/board"; // 삭제 후 게시판 목록으로 이동
+    // 📌 게시글 삭제 기능
+@PostMapping("/delete/{id}")
+public String deleteBoard(@PathVariable("id") int boardId) {
+    System.out.println("📌 [디버깅] 삭제할 게시글 ID: " + boardId);
+    int result = boardMapper.delete(boardId);
+
+    if (result > 0) {
+        System.out.println("✅ 게시글 삭제 완료!");
+    } else {
+        System.out.println("❌ 게시글 삭제 실패!");
     }
+
+    return "redirect:/board"; // 삭제 후 목록으로 이동
+}
+
+
+
 }
 
